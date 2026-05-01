@@ -54,7 +54,11 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   },
   formaFarmaceutica: {
     type: String,
-    required: true
+    required: true,
+    validate: {
+      validator: (value: string) => validator.isIn(value, formaFarmaceuticaEnum),
+      message: 'La forma farmacéutica no es válida'
+    }
   },
   dosisEstandar: {
     type: Number,
