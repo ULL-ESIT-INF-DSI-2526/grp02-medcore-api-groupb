@@ -27,14 +27,20 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   nombre: {
     type: String,
     required: true,
-    minlength: [3, 'El nombre comercial debe tener al menos 3 caracteres'],
-    trim: true
+    trim: true,
+    validate: {
+      validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
+      message: 'El nombre comercial debe tener al menos 3 caracteres'
+    }
   },
   ingredienteActivo: {
     type: String,
     required: true,
-    minlength: [3, 'El ingrediente activo debe tener al menos 3 caracteres'],
-    trim: true
+    trim: true,
+    validate: {
+      validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
+      message: 'El ingrediente activo debe tener al menos 3 caracteres'
+    }
   },
   codigoNacional: {
     type: String,
@@ -42,13 +48,12 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     unique: true,
     trim: true,
     validate: {
-      validator: (v: string) => typeof v === 'string' && v.length > 0,
+      validator: (value: string) => !validator.isEmpty(value.trim()),
       message: 'El código nacional es obligatorio'
     }
   },
   formaFarmaceutica: {
     type: String,
-    enum: formaFarmaceuticaEnum,
     required: true
   },
   dosisEstandar: {
@@ -63,8 +68,11 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   },
   viaAdministracion: {
     type: String,
-    enum: viaAdministracionEnum,
-    required: true
+    required: true,
+    validate: {
+      validator: (value: string) => validator.isIn(value, viaAdministracionEnum),
+      message: 'La vía de administración no es válida'
+    }
   },
   stock: {
     type: Number,
