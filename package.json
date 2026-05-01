@@ -33,8 +33,9 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "express": "^5.1.0",
-    "mongoose": "^8.13.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^8.23.1",
     "validator": "^13.15.35"
   }
 }
