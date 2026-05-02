@@ -6,7 +6,7 @@ type ViaAdministracion = "oral" | "intravenosa" | "intramuscular" | "subcutánea
 
 interface MedicationDocumentInterface extends Document {
   nombre: string,
-  ingredienteActivo: string,
+  principioActivo: string,
   codigoNacional: string,
   formaFarmaceutica: FormaFarmaceutica,
   dosisEstandar: number, // mg
@@ -30,16 +30,16 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     validate: {
       validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
       message: 'El nombre comercial debe tener al menos 3 caracteres'
-    }
+    },
   },
-  ingredienteActivo: {
+  principioActivo: {
     type: String,
     required: true,
     trim: true,
     validate: {
       validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
-      message: 'El ingrediente activo debe tener al menos 3 caracteres'
-    }
+      message: 'El principio activo debe tener al menos 3 caracteres'
+    },
   },
   codigoNacional: {
     type: String,
@@ -49,7 +49,7 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     validate: {
       validator: (value: string) => !validator.isEmpty(value.trim()),
       message: 'El código nacional es obligatorio'
-    }
+    },
   },
   formaFarmaceutica: {
     type: String,
@@ -57,7 +57,7 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     validate: {
       validator: (value: string) => validator.isIn(value, formaFarmaceuticaEnum),
       message: 'La forma farmacéutica no es válida'
-    }
+    },
   },
   dosisEstandar: {
     type: Number,
@@ -70,35 +70,34 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     validate: {
       validator: (value: string) => validator.isIn(value, viaAdministracionEnum),
       message: 'La vía de administración no es válida'
-    }
+    },
   },
   stock: {
     type: Number,
     required: true,
     min: [0, 'El stock mínimo es 0'],
-    default: 0
+    default: 0,
   },
   precio: {
     type: Number,
     required: true,
-    min: [0, 'El precio por unidad no puede ser negativo']
+    min: [0, 'El precio por unidad no puede ser negativo'],
   },
   prescripcion: {
     type: Boolean,
-    default: false
+    required: true,
+    default: false,
   },
   caducidadStock: {
     type: Date,
-    required: false
+    required: true,
   },
   contraindicaciones: {
     type: [String],
-    default: []
+    default: [],
   }
 });
 
 MedicationSchema.index({ codigoNacional: 1 }, { unique: true });
 
-const Medication = model<MedicationDocumentInterface>('Medication', MedicationSchema);
-
-export default Medication;
+export const Medication = model<MedicationDocumentInterface>('Medication', MedicationSchema);

@@ -1,5 +1,5 @@
 import express from "express";
-import { Paciente } from "../models/paciente.js";
+import { Paciente } from "../models/patients.js";
 
 export const pacientesRouter = express.Router();
 
