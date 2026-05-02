@@ -9,7 +9,8 @@ interface MedicationDocumentInterface extends Document {
   principioActivo: string,
   codigoNacional: string,
   formaFarmaceutica: FormaFarmaceutica,
-  dosisEstandar: number, // mg
+  dosisEstandar: number,
+  unidadMedida: string,
   viaAdministracion: ViaAdministracion,
   stock: number,
   precio: number,
@@ -62,7 +63,11 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   dosisEstandar: {
     type: Number,
     required: true,
-    min: [0, 'La dosis estándar no puede ser negativa']
+    min: [0, 'La dosis estándar no puede ser negativa'],
+  },
+  unidadMedida: {
+    type: String,
+    required: true,
   },
   viaAdministracion: {
     type: String,
@@ -95,9 +100,7 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   contraindicaciones: {
     type: [String],
     default: [],
-  }
+  },
 });
-
-MedicationSchema.index({ codigoNacional: 1 }, { unique: true });
 
 export const Medication = model<MedicationDocumentInterface>('Medication', MedicationSchema);
