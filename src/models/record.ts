@@ -26,7 +26,7 @@ interface RecordDocumentInterface extends Document {
 const recordTypeEnum: RecordType[] = ["consulta ambulatoria", "ingreso hospitalario"];
 const recordStatusEnum: RecordStatus[] = ["abierto", "cerrado"];
 
-const PrescribedMedicationSchema = new Schema({
+const PrescribedMedicationSchema = new Schema<PrescribedMedicationInterface>({
   medication: {
     type: Schema.Types.ObjectId,
     ref: 'Medication',
@@ -40,10 +40,11 @@ const PrescribedMedicationSchema = new Schema({
   dosageInstructions: {
     type: String,
     required: true,
-    validate: {
-      validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
-      message: 'Las instrucciones de dosis deben tener al menos 3 caracteres'
-    }
+    validate: (value: string) => {
+      if (!validator.isLength(value.trim(), { min: 3 })) {
+        throw new Error('Las instrucciones de dosis deben tener al menos 3 caracteres');
+      }
+    },
   }
 }, { _id: false });
 
@@ -51,46 +52,49 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
   patient: {
     type: Schema.Types.ObjectId,
     ref: 'Patient',
-    required: true
+    required: true,
   },
   responsibleDoctor: {
     type: Schema.Types.ObjectId,
     ref: 'Staff',
-    required: true
+    required: true,
   },
   type: {
     type: String,
     enum: recordTypeEnum,
     required: true,
-    validate: {
-      validator: (value: string) => validator.isIn(value, recordTypeEnum),
-      message: 'El tipo de registro no es válido'
-    }
+    validate: (value: string) => {
+      if (!validator.isIn(value, recordTypeEnum)) {
+        throw new Error('El tipo de registro no es válido');
+      }
+    },
   },
   startDate: {
     type: Date,
-    default: Date.now,
-    required: true
+    default: Date.now(),
+    required: true,
   },
   endDate: {
     type: Date,
-    required: false
+    required: false,
   },
   reason: {
     type: String,
     required: true,
-    validate: {
-      validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
-      message: 'La razón debe tener al menos 3 caracteres'
-    }
+    validate: (value: string) => {
+      if (!validator.isLength(value.trim(), { min: 3 })) {
+        throw new Error('La razón debe tener al menos 3 caracteres');
+      }
+    },
   },
   diagnosis: {
     type: String,
     required: true,
-    validate: {
-      validator: (value: string) => validator.isLength(value.trim(), { min: 3 }),
-      message: 'El diagnóstico debe tener al menos 3 caracteres'
-    }
+    validate: (value: string) => {
+      if (!validator.isLength(value.trim(), { min: 3 })) {
+        throw new Error('El diagnóstico debe tener al menos 3 caracteres');
+      }
+    },
   },
   prescribedMedications: {
     type: [PrescribedMedicationSchema],
@@ -105,13 +109,12 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
     type: String,
     enum: recordStatusEnum,
     required: true,
-    validate: {
-      validator: (value: string) => validator.isIn(value, recordStatusEnum),
-      message: 'El estado del registro no es válido'
-    }
+    validate: (value: string) => {
+      if (!validator.isIn(value, recordStatusEnum)) {
+        throw new Error('El estado del registro no es válido');
+      }
+    },
   }
 });
 
-const Record = model<RecordDocumentInterface>('Record', RecordSchema);
-
-export default Record;
+export const Record = model<RecordDocumentInterface>('Record', RecordSchema);
