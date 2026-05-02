@@ -97,7 +97,6 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
   }
 });
 
-MedicationSchema.index({ codigoNacional: 1 }, { unique: true });
 
 const Medication = model<MedicationDocumentInterface>('Medication', MedicationSchema);
 
