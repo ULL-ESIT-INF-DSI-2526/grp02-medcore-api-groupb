@@ -10,12 +10,11 @@ interface MedicationDocumentInterface extends Document {
   codigoNacional: string,
   formaFarmaceutica: FormaFarmaceutica,
   dosisEstandar: number, // mg
-  genero: "hombre" | "mujer",
   viaAdministracion: ViaAdministracion,
   stock: number,
   precio: number,
   prescripcion: boolean,
-  caducidadStock?: Date,
+  caducidadStock: Date,
   contraindicaciones: string[],
 
 }
@@ -64,11 +63,6 @@ const MedicationSchema = new Schema<MedicationDocumentInterface>({
     type: Number,
     required: true,
     min: [0, 'La dosis estándar no puede ser negativa']
-  },
-  genero: {
-    type: String,
-    enum: ["hombre", "mujer"],
-    required: false
   },
   viaAdministracion: {
     type: String,
