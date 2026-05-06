@@ -71,7 +71,7 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
   },
   startDate: {
     type: Date,
-    default: Date.now(),
+    default: Date.now,
     required: true,
   },
   endDate: {

@@ -1,5 +1,6 @@
 import express from "express";
 import { Paciente } from "../models/patients.js";
+import { Record } from "../models/record.js";
 
 export const pacientesRouter = express.Router();
 
@@ -88,6 +89,7 @@ pacientesRouter.patch("/patients/:id", async (req, res) => {
   }
 });
 
+// Justificar decisión de borrar todos los registros asociados al paciente en la documentación
 pacientesRouter.delete("/patients", async (req, res) => {
   let filtro = {};
   if (req.query.nombre) {
@@ -99,13 +101,14 @@ pacientesRouter.delete("/patients", async (req, res) => {
   }
 
   try {
-    const paciente = await Paciente.findOneAndDelete(filtro);
-
-    if (paciente) {
-      res.send(paciente);
-    } else {
-      res.status(404).send();
+    const paciente = await Paciente.findOne(filtro);
+    if (!paciente) {
+      return res.status(404).send();
     }
+
+    await Record.deleteMany({ patient: paciente._id });
+    await Paciente.findByIdAndDelete(paciente._id); 
+    res.send(paciente); 
   } catch (error) {
     res.status(500).send(error);
   }
@@ -113,13 +116,14 @@ pacientesRouter.delete("/patients", async (req, res) => {
 
 pacientesRouter.delete("/patients/:id", async (req, res) => {
   try {
-    const paciente = await Paciente.findByIdAndDelete(req.params.id);
-
-    if (paciente) {
-      res.send(paciente);
-    } else {
-      res.status(404).send();
+    const paciente = await Paciente.findById(req.params.id);
+    if (!paciente) {
+      return res.status(404).send();
     }
+
+    await Record.deleteMany({ patient: paciente._id });
+    await Paciente.findByIdAndDelete(paciente._id); 
+    res.send(paciente);
   } catch (error) {
     res.status(500).send(error);
   }

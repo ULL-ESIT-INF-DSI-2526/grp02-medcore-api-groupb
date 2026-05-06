@@ -1,5 +1,7 @@
 import express from "express";
 import { Medication } from "../models/medication.js";
+import { Record } from "../models/record.js";
+import QueryString from "qs";
 
 export const medicationsRouter = express.Router();
 
@@ -15,17 +17,18 @@ medicationsRouter.post("/medications", async (req, res) => {
 });
 
 // Función auxiliar para construir el filtro de búsqueda
-const buildMedicationFilter = (query: any) => {
-  if (query.nombre) return { nombre: query.nombre.toString() };
-  if (query.principioActivo) return { principioActivo: query.principioActivo.toString() };
-  if (query.codigoNacional) return { codigoNacional: query.codigoNacional.toString() };
-  return null;
+const construirFiltroBusqueda = (query: QueryString.ParsedQs) => {
+  let filtro = {};
+  if (query.nombre) filtro = {...filtro, nombre: query.nombre.toString() };
+  if (query.principioActivo) filtro = {...filtro, principioActivo: query.principioActivo.toString() };
+  if (query.codigoNacional) filtro = {...filtro, codigoNacional: query.codigoNacional.toString() };
+  return filtro;
 };
 
 // 2. LEER (GET) mediante query string
 medicationsRouter.get("/medications", async (req, res) => {
-  const filtro = buildMedicationFilter(req.query);
-  if (!filtro) {
+  const filtro = construirFiltroBusqueda(req.query);
+  if (Object.keys(filtro).length === 0) {
     return res.status(400).send({ error: "Falta parámetro de búsqueda (nombre, principioActivo o codigoNacional)" });
   }
 
@@ -38,7 +41,7 @@ medicationsRouter.get("/medications", async (req, res) => {
   }
 });
 
-// 3. LEER (GET) por ID dinámico
+// 3. LEER (GET) por parámetro dinámico
 medicationsRouter.get("/medications/:id", async (req, res) => {
   try {
     const medicamento = await Medication.findById(req.params.id);
@@ -51,8 +54,8 @@ medicationsRouter.get("/medications/:id", async (req, res) => {
 
 // 4. MODIFICAR (PATCH) mediante query string
 medicationsRouter.patch("/medications", async (req, res) => {
-  const filtro = buildMedicationFilter(req.query);
-  if (!filtro) return res.status(400).send({ error: "Falta parámetro de búsqueda" });
+  const filtro = construirFiltroBusqueda(req.query);
+  if (Object.keys(filtro).length === 0) return res.status(400).send({ error: "Falta parámetro de búsqueda" });
 
   try {
     const medicamento = await Medication.findOneAndUpdate(filtro, req.body, { new: true, runValidators: true });
@@ -76,24 +79,46 @@ medicationsRouter.patch("/medications/:id", async (req, res) => {
 
 // 6. BORRAR (DELETE) mediante query string
 medicationsRouter.delete("/medications", async (req, res) => {
-  const filtro = buildMedicationFilter(req.query);
-  if (!filtro) return res.status(400).send({ error: "Falta parámetro de búsqueda" });
+  const filtro = construirFiltroBusqueda(req.query);
+  if (Object.keys(filtro).length === 0) return res.status(400).send({ error: "Falta parámetro de búsqueda" });
 
   try {
-    const medicamento = await Medication.findOneAndDelete(filtro);
-    if (medicamento) res.send(medicamento);
-    else res.status(404).send();
+    const medicamento = await Medication.findOne(filtro);
+    if (!medicamento) {
+      return res.status(404).send();
+    } 
+
+    const registro = await Record.findOne({ "prescribedMedications.medication": medicamento._id });
+    if (registro) {
+      return res.status(409).send({
+        error: "No se puede borrar el medicamento porque se encuentra prescrito"
+      });
+    }
+
+    await Medication.findByIdAndDelete(medicamento._id);
+    res.send(medicamento); 
   } catch (error) {
     res.status(500).send(error);
   }
 });
 
-// 7. BORRAR (DELETE) por ID dinámico
+// 7. BORRAR (DELETE) por parámetro dinámico
 medicationsRouter.delete("/medications/:id", async (req, res) => {
   try {
-    const medicamento = await Medication.findByIdAndDelete(req.params.id);
-    if (medicamento) res.send(medicamento);
-    else res.status(404).send();
+    const medicamento = await Medication.findById(req.params.id);
+    if (!medicamento) {
+      return res.status(404).send();
+    }
+
+    const registro = await Record.findOne({ "prescribedMedications.medication": req.params.id })
+    if (registro) {
+      return res.status(409).send({
+        error: "No se puede borrar el medicamento porque se encuentra prescrito"
+      });
+    }
+
+    await Medication.findByIdAndDelete(req.params.id);
+    res.send(medicamento);
   } catch (error) {
     res.status(500).send(error);
   }

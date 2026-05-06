@@ -1,5 +1,6 @@
 import express from "express";
 import { Staff } from "../models/staff.js"; // Asegúrate de que la ruta coincida con donde guardaste staff.ts
+import { Record } from "../models/record.js";
 
 export const staffRouter = express.Router();
 
@@ -95,6 +96,7 @@ staffRouter.patch("/staff/:id", async (req, res) => {
   }
 });
 
+// Justificar decisión de mantener los registros asociados y la sugerencia de cambiar el estado a inactivo en la documentación
 // 6. BORRAR (DELETE) personal mediante query string
 staffRouter.delete("/staff", async (req, res) => {
   let filtro = {};
@@ -108,13 +110,20 @@ staffRouter.delete("/staff", async (req, res) => {
   }
 
   try {
-    const staffMember = await Staff.findOneAndDelete(filtro);
-
-    if (staffMember) {
-      res.send(staffMember);
-    } else {
-      res.status(404).send();
+    const staffMember = await Staff.findOne(filtro);
+    if (!staffMember) {
+      return res.status(404).send();
     }
+
+    const registros = await Record.findOne({ responsibleDoctor: staffMember._id });
+    if (registros) {
+      return res.status(409).send({
+        error: "El personal médico que intenta borrar tiene historiales asignados, cambie su estado a 'inactivo' en lugar de borrarlo"
+      });
+    }
+
+    await Staff.findByIdAndDelete(staffMember._id);
+    res.send(staffMember);
   } catch (error) {
     res.status(500).send(error);
   }
@@ -123,13 +132,20 @@ staffRouter.delete("/staff", async (req, res) => {
 // 7. BORRAR (DELETE) personal por su ID dinámico
 staffRouter.delete("/staff/:id", async (req, res) => {
   try {
-    const staffMember = await Staff.findByIdAndDelete(req.params.id);
-
-    if (staffMember) {
-      res.send(staffMember);
-    } else {
-      res.status(404).send();
+    const staffMember = await Staff.findById(req.params.id);
+    if (!staffMember) {
+      return res.status(404).send();
     }
+
+    const registros = await Record.findOne({ responsibleDoctor: staffMember._id });
+    if (registros) {
+      return res.status(409).send({
+        error: "El personal médico que intenta borrar tiene historiales asignados, cambie su estado a 'inactivo' en lugar de borrarlo"
+      });
+    }
+
+    await Staff.findByIdAndDelete(staffMember._id);
+    res.send(staffMember);
   } catch (error) {
     res.status(500).send(error);
   }
