@@ -6,38 +6,65 @@ import { Medication } from "../models/medication.js";
 
 export const recordsRouter = express.Router();
 
+async function validarPaciente(dni: string) {
+  const paciente = await Patient.findOne({ dni });
+  if (!paciente) { throw new Error(`El paciente con dni ${dni} no existe.`) }
+  return paciente._id;
+}
+
+async function validarMedico(numeroColegiado: string) {
+  const medico = await Staff.findOne({ numeroColegiado, estado: "activo" });
+  if (!medico) { throw new Error(`El médico con número de colegiado ${numeroColegiado} no existe o se encuentra inactivo`) }
+  return medico._id;
+}
+
+async function verificarMedicaciones(medicaciones: { codigoNacional: string, cantidad: number, instruccionesAdministracion: string }[]) {
+  let total = 0;
+  const medicacionesPrescritas: unknown[] = [];
+
+  for (const item of medicaciones) {
+    const medicamento = await Medication.findOne({ codigoNacional: item.codigoNacional });
+    if (!medicamento) { throw new Error(`El medicamento con código ${item.codigoNacional} no existe.`); }
+    if (medicamento.stock < item.cantidad) { throw new Error(`Stock insuficiente para ${medicamento.nombre}`); }
+
+    // Importe total
+    total += medicamento.precio * item.cantidad;
+
+    medicacionesPrescritas.push({
+      medicamento: medicamento._id,
+      cantidad: item.cantidad,
+      instruccionesAdministracion: item.instruccionesAdministracion
+    });
+
+    // Actualizar stock
+    medicamento.stock -= item.cantidad;
+    await medicamento.save();
+  }
+
+  return { total, medicacionesPrescritas };
+}
+
 recordsRouter.post("/records", async (req, res) => {
-
   try {
+    const { dniPaciente, numeroColegiadoMedico, medicamentos, tipo, fechaInicio, fechaFin, motivo, diagnostico, estado } = req.body;
+    const pacienteId = await validarPaciente(dniPaciente);
+    const medicoId = await validarMedico(numeroColegiadoMedico);
+    const { total, medicacionesPrescritas } = await verificarMedicaciones(medicamentos)
+    const record = new Record({
+      paciente: pacienteId,
+      medicoResponsable: medicoId,
+      tipo: tipo,
+      fechaInicio: fechaInicio,
+      fechaFin: fechaFin,
+      motivo: motivo,
+      diagnostico: diagnostico,
+      estado: estado,
+      medicamentosPrescritos: medicacionesPrescritas,
+      costeTotalMedicamentos: total
+    });
 
-    // Verificar existencia de paciente y medico responsable
-    const paciente = await Patient.findOne({ dni: req.body.dni });
-    const medicoResponsable = await Staff.findOne({ numeroColegiado: req.body.numeroColegiado});
-    
-    if (!paciente) {
-      return res.status(404).send({ error: "Paciente no encontrado" });
-    }
-    if (!medicoResponsable) {
-      return res.status(404).send({ error: "Médico responsable no encontrado" });
-    }
-
-    // Verificar la existencia y disponibilidad de los medicamentos
-
-    for (const codigoNacional of req.body.medicamentos) {
-      const medicamento = await Medication.findOne({ codigoNacional });
-      if (!medicamento) {
-        return res.status(404).send({ error: `Medicamento con ${codigoNacional} no encontrado` });
-      } else {
-        if (medicamento.stock > 0) {
-          medicamento.stock = medicamento.stock - req.body.cantidad;
-          await medicamento.save();
-        } else {
-          return res.status(400).send({ error: `Medicamento con ${codigoNacional} sin stock disponible` });
-        }
-      }
-    }
-
-
+    await record.save();
+    res.status(201).send(record);
   } catch (error) {
     return res.status(500).send(error);
   }

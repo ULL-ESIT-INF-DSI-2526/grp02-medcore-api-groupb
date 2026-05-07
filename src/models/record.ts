@@ -18,7 +18,7 @@ interface RecordDocumentInterface extends Document {
   fechaFin?: Date,
   motivo: string,
   diagnostico: string,
-  medicamentosPreescritos: PrescribedMedicationInterface[],
+  medicamentosPrescritos: PrescribedMedicationInterface[],
   costeTotalMedicamentos: number,
   estado: RecordStatus
 }
@@ -96,7 +96,7 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
       }
     },
   },
-  medicamentosPreescritos: {
+  medicamentosPrescritos: {
     type: [PrescribedMedicationSchema],
     default: []
   },
