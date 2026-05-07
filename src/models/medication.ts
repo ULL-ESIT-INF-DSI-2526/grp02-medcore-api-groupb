@@ -17,7 +17,6 @@ interface MedicationDocumentInterface extends Document {
   prescripcion: boolean,
   caducidadStock: Date,
   contraindicaciones: string[],
-
 }
 
 const formaFarmaceuticaEnum: FormaFarmaceutica[] = ["comprimido", "cápsula", "solución oral", "solución inyectable", "pomada", "parche transdérmico", "inhalador", "otras"];

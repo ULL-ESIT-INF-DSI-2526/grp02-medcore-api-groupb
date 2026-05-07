@@ -5,39 +5,39 @@ type RecordType = "consulta ambulatoria" | "ingreso hospitalario";
 type RecordStatus = "abierto" | "cerrado";
 
 interface PrescribedMedicationInterface {
-  medication: Schema.Types.ObjectId,
-  quantity: number,
-  dosageInstructions: string
+  medicamento: Schema.Types.ObjectId,
+  cantidad: number,
+  instruccionesAdministracion: string
 }
 
 interface RecordDocumentInterface extends Document {
-  patient: Schema.Types.ObjectId,
-  responsibleDoctor: Schema.Types.ObjectId,
-  type: RecordType,
-  startDate: Date,
-  endDate?: Date,
-  reason: string,
-  diagnosis: string,
-  prescribedMedications: PrescribedMedicationInterface[],
-  totalMedicationCost: number,
-  status: RecordStatus
+  paciente: Schema.Types.ObjectId,
+  medicoResponsable: Schema.Types.ObjectId,
+  tipo: RecordType,
+  fechaInicio: Date,
+  fechaFin?: Date,
+  motivo: string,
+  diagnostico: string,
+  medicamentosPreescritos: PrescribedMedicationInterface[],
+  costeTotalMedicamentos: number,
+  estado: RecordStatus
 }
 
 const recordTypeEnum: RecordType[] = ["consulta ambulatoria", "ingreso hospitalario"];
 const recordStatusEnum: RecordStatus[] = ["abierto", "cerrado"];
 
 const PrescribedMedicationSchema = new Schema<PrescribedMedicationInterface>({
-  medication: {
+  medicamento: {
     type: Schema.Types.ObjectId,
     ref: 'Medication',
     required: true
   },
-  quantity: {
+  cantidad: {
     type: Number,
     required: true,
     min: [1, 'La cantidad debe ser mayor a 0']
   },
-  dosageInstructions: {
+  instruccionesAdministracion: {
     type: String,
     required: true,
     validate: (value: string) => {
@@ -49,17 +49,17 @@ const PrescribedMedicationSchema = new Schema<PrescribedMedicationInterface>({
 }, { _id: false });
 
 const RecordSchema = new Schema<RecordDocumentInterface>({
-  patient: {
+  paciente: {
     type: Schema.Types.ObjectId,
     ref: 'Patient',
     required: true,
   },
-  responsibleDoctor: {
+  medicoResponsable: {
     type: Schema.Types.ObjectId,
     ref: 'Staff',
     required: true,
   },
-  type: {
+  tipo: {
     type: String,
     enum: recordTypeEnum,
     required: true,
@@ -69,16 +69,16 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
       }
     },
   },
-  startDate: {
+  fechaInicio: {
     type: Date,
     default: Date.now,
     required: true,
   },
-  endDate: {
+  fechaFin: {
     type: Date,
     required: false,
   },
-  reason: {
+  motivo: {
     type: String,
     required: true,
     validate: (value: string) => {
@@ -87,7 +87,7 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
       }
     },
   },
-  diagnosis: {
+  diagnostico: {
     type: String,
     required: true,
     validate: (value: string) => {
@@ -96,16 +96,16 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
       }
     },
   },
-  prescribedMedications: {
+  medicamentosPreescritos: {
     type: [PrescribedMedicationSchema],
     default: []
   },
-  totalMedicationCost: {
+  costeTotalMedicamentos: {
     type: Number,
     default: 0,
     min: [0, 'El costo total no puede ser negativo']
   },
-  status: {
+  estado: {
     type: String,
     enum: recordStatusEnum,
     required: true,

@@ -1,7 +1,7 @@
 import { Document, Schema, model } from "mongoose";
 import validator from "validator";
 
-interface PacienteDocumentInterface extends Document {
+interface PatientDocumentInterface extends Document {
   nombre: string,
   fechaNacimiento: Date,
   dni: string,
@@ -15,7 +15,7 @@ interface PacienteDocumentInterface extends Document {
   estado: "activo" | "baja temporal" | "fallecido",
 }
 
-const PacienteSchema = new Schema<PacienteDocumentInterface>({
+const PatientSchema = new Schema<PatientDocumentInterface>({
   nombre: {
     type: String,
     required: true,
@@ -99,4 +99,4 @@ const PacienteSchema = new Schema<PacienteDocumentInterface>({
   },
 });
 
-export const Paciente = model<PacienteDocumentInterface>("Paciente", PacienteSchema);
+export const Patient = model<PatientDocumentInterface>("Patient", PatientSchema);

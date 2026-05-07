@@ -1,18 +1,18 @@
 import express from "express";
 import { Record } from "../models/record.js";
-import { Paciente } from "../models/patients.js";
+import { Patient } from "../models/patients.js";
 import { Staff } from "../models/staff.js";
 import { Medication } from "../models/medication.js";
 
 export const recordsRouter = express.Router();
 
-// 1. CREAR (POST) - Lógica compleja de negocio
+// 1. CREAR (POST) 
 recordsRouter.post("/records", async (req, res) => {
   const { pacienteDni, medicoColegiado, medicamentosPrescritos, ...recordData } = req.body;
 
   try {
     // 1. Verificar paciente
-    const paciente = await Paciente.findOne({ dni: pacienteDni });
+    const paciente = await Patient.findOne({ dni: pacienteDni });
     if (!paciente) return res.status(404).send({ error: "Paciente no encontrado" });
 
     // 2. Verificar médico
@@ -73,7 +73,7 @@ recordsRouter.get("/records", async (req, res) => {
   try {
     if (req.query.pacienteDni) {
       // Buscar por DNI del paciente
-      const paciente = await Paciente.findOne({ dni: req.query.pacienteDni.toString() });
+      const paciente = await Patient.findOne({ dni: req.query.pacienteDni.toString() });
       if (!paciente) return res.status(404).send({ error: "Paciente no encontrado" });
       
       const records = await Record.find({ patient: paciente._id }).sort({ startDate: 1 }); // Cronológico
