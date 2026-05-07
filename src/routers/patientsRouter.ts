@@ -1,11 +1,11 @@
 import express from "express";
-import { Paciente } from "../models/patients.js";
+import { Patient } from "../models/patients.js";
 import { Record } from "../models/record.js";
 
 export const pacientesRouter = express.Router();
 
 pacientesRouter.post("/patients", async (req, res) => {
-  const paciente = new Paciente(req.body);
+  const paciente = new Patient(req.body);
 
   try {
     await paciente.save();
@@ -26,7 +26,7 @@ pacientesRouter.get("/patients", async (req, res) => {
   }
 
   try {
-    const paciente = await Paciente.find(filtro);
+    const paciente = await Patient.find(filtro);
     
     if (paciente.length !== 0) {
       res.send(paciente);
@@ -40,7 +40,7 @@ pacientesRouter.get("/patients", async (req, res) => {
 
 pacientesRouter.get("/patients/:id", async (req, res) => {
   try {
-    const paciente = await Paciente.findById(req.params.id);
+    const paciente = await Patient.findById(req.params.id);
 
     if (paciente) {
       res.send(paciente);
@@ -63,7 +63,7 @@ pacientesRouter.patch("/patients", async (req, res) => {
   }
 
   try {
-    const paciente = await Paciente.findOneAndUpdate(filtro, req.body, { new: true, runValidators: true });
+    const paciente = await Patient.findOneAndUpdate(filtro, req.body, { new: true, runValidators: true });
 
     if (paciente) {
       res.send(paciente);
@@ -77,7 +77,7 @@ pacientesRouter.patch("/patients", async (req, res) => {
 
 pacientesRouter.patch("/patients/:id", async (req, res) => {
   try {
-    const paciente = await Paciente.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+    const paciente = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
 
     if (paciente) {
       res.send(paciente);
@@ -101,13 +101,13 @@ pacientesRouter.delete("/patients", async (req, res) => {
   }
 
   try {
-    const paciente = await Paciente.findOne(filtro);
+    const paciente = await Patient.findOne(filtro);
     if (!paciente) {
       return res.status(404).send();
     }
 
     await Record.deleteMany({ patient: paciente._id });
-    await Paciente.findByIdAndDelete(paciente._id); 
+    await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente); 
   } catch (error) {
     res.status(500).send(error);
@@ -116,13 +116,13 @@ pacientesRouter.delete("/patients", async (req, res) => {
 
 pacientesRouter.delete("/patients/:id", async (req, res) => {
   try {
-    const paciente = await Paciente.findById(req.params.id);
+    const paciente = await Patient.findById(req.params.id);
     if (!paciente) {
       return res.status(404).send();
     }
 
     await Record.deleteMany({ patient: paciente._id });
-    await Paciente.findByIdAndDelete(paciente._id); 
+    await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente);
   } catch (error) {
     res.status(500).send(error);
