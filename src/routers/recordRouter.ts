@@ -121,58 +121,17 @@ recordsRouter.get("/records/:id", async (req, res) => {
   }
 });
 
-recordsRouter.patch("/records", async (req, res) => {
-  try {
-    const dni = req.query.dni?.toString();
-    if (!dni) {
-      return res.status(400).send({ error: "Falta indicar número de identificación" });
-    }
-
-    const paciente = await Patient.findOne({ dni });
-    if (!paciente) {
-      return res.status(404).send({ error: "Paciente no encontrado" });
-    }
-
-    const record = await Record.findOneAndUpdate({ paciente: paciente._id }, req.body, { new: true, runValidators: true });
-    if (record) {
-      res.send(record);
-    } else {
-      res.status(404).send();
-    }
-  } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-
 
 recordsRouter.patch("/records/:id", async (req, res) => {
   try {
-    const record = await Record.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
-    if (record) {
-      res.send(record);
-    } else {
-      res.status(404).send();
-    }
-  } catch (error) {
-    return res.status(500).send(error);
-  }
-});
-
-recordsRouter.delete("/records", async (req, res) => {
-  try {
-    const dni = req.query.dni?.toString();
-    if (!dni) {
-      return res.status(400).send({ error: "Falta indicar número de identificación" });
+    // no esta actualizando el stock de los medicamentos, ni validando el nuevo medico o las nuevas medicaciones
+    const record = await Record.findById(req.params.id);
+    if (!record) {
+      return res.status(404).send();
     }
 
-    const paciente = await Patient.findOne({ dni });
-    if (!paciente) {
-      return res.status(404).send({ error: "Paciente no encontrado" });
-    }
-
-    // actualizar stock
-    const records = await Record.find({ paciente: paciente._id });
-    for (const record of records) {
+    //restaurar el stock de los medicamentos prescritos originalmente
+    if (req.body.medicamentos) {
       for (const item of record.medicamentosPrescritos) {
         const medicamento = await Medication.findById(item.medicamento);
         if (medicamento) {
@@ -180,16 +139,34 @@ recordsRouter.delete("/records", async (req, res) => {
           await medicamento.save();
         }
       }
+      //usar funcion verificar medicamento para validar y actuializar el stock de los nuevos medicamentos prescritos (tmb se actualiza el costo)
+      const {total, medicacionesPrescritas} = await verificarMedicaciones(req.body.medicamentos);
+
+      req.body.costeTotalMedicamentos = total;
+      req.body.medicamentosPrescritos = medicacionesPrescritas;
+
+      delete req.body.medicamentos;
     }
 
-    // eliminar registros
-    await Record.deleteMany({ paciente: paciente._id })
-    res.send(records);
+    if (req.body.dniPaciente) {
+      req.body.paciente = await validarPaciente(req.body.dniPaciente);
+    }
+    if (req.body.numeroColegiadoMedico) {
+      req.body.medicoResponsable = await validarMedico(req.body.numeroColegiadoMedico);
+    }    
     
-  } catch (error) {
-    return res.status(500).send(error);
+    const recordActualizado = await Record.findByIdAndUpdate(
+      req.params.id, 
+      req.body, 
+      { new: true, runValidators: true }
+    );
+
+    res.send(recordActualizado);
+  }catch (error) {
+    res.status(500).send(error);
   }
 });
+
 
 recordsRouter.delete("/records/:id", async (req, res) => {
   try {
