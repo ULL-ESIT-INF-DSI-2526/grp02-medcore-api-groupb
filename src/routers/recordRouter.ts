@@ -124,13 +124,12 @@ recordsRouter.get("/records/:id", async (req, res) => {
 
 recordsRouter.patch("/records/:id", async (req, res) => {
   try {
-    // no esta actualizando el stock de los medicamentos, ni validando el nuevo medico o las nuevas medicaciones
     const record = await Record.findById(req.params.id);
     if (!record) {
       return res.status(404).send();
     }
 
-    //restaurar el stock de los medicamentos prescritos originalmente
+    //restaurar el stock de los medicamentos prescritos originalmente si se modifican
     if (req.body.medicamentos) {
       for (const item of record.medicamentosPrescritos) {
         const medicamento = await Medication.findById(item.medicamento);
