@@ -158,3 +158,38 @@ recordsRouter.patch("/records/:id", async (req, res) => {
   }
 });
 
+recordsRouter.delete("/records", async (req, res) => {
+  try {
+    const dni = req.query.dni?.toString();
+    if (!dni) {
+      return res.status(400).send({ error: "Falta indicar número de identificación" });
+    }
+    const paciente = await Patient.findOne({ dni });
+    if (!paciente) {
+      return res.status(404).send({ error: "Paciente no encontrado" });
+    }
+
+    const record = await Record.findOneAndDelete({ paciente: paciente._id });
+    if (record) {
+      res.send(record);
+    } else {
+      res.status(404).send();
+    }
+    
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
+
+recordsRouter.delete("/records/:id", async (req, res) => {
+  try {
+    const record = await Record.findByIdAndDelete(req.params.id);
+    if (record) {
+      res.send(record);
+    } else {
+      res.status(404).send();
+    }
+  } catch (error) {
+    return res.status(500).send(error);
+  }
+});
