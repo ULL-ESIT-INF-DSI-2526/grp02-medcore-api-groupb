@@ -52,6 +52,7 @@ pacientesRouter.get("/patients/:id", async (req, res) => {
   }
 });
 
+// MODIFICAR (PATCH) paciente mediante query string
 pacientesRouter.patch("/patients", async (req, res) => {
   let filtro = {};
   if (req.query.nombre) {
@@ -75,6 +76,7 @@ pacientesRouter.patch("/patients", async (req, res) => {
   }
 });
 
+// MODIFICAR (PATCH) paciente mediante ID dinámico 
 pacientesRouter.patch("/patients/:id", async (req, res) => {
   try {
     const paciente = await Patient.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
