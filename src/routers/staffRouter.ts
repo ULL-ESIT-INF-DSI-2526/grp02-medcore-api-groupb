@@ -11,8 +11,16 @@ staffRouter.post("/staff", async (req, res) => {
   try {
     await staffMember.save();
     res.status(201).send(staffMember);
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -36,8 +44,16 @@ staffRouter.get("/staff", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -51,8 +67,16 @@ staffRouter.get("/staff/:id", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -76,8 +100,16 @@ staffRouter.patch("/staff", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -91,8 +123,16 @@ staffRouter.patch("/staff/:id", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -124,8 +164,16 @@ staffRouter.delete("/staff", async (req, res) => {
 
     await Staff.findByIdAndDelete(staffMember._id);
     res.send(staffMember);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -146,7 +194,15 @@ staffRouter.delete("/staff/:id", async (req, res) => {
 
     await Staff.findByIdAndDelete(staffMember._id);
     res.send(staffMember);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

@@ -10,8 +10,16 @@ pacientesRouter.post("/patients", async (req, res) => {
   try {
     await paciente.save();
     res.status(201).send(paciente);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -33,8 +41,16 @@ pacientesRouter.get("/patients", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -47,8 +63,16 @@ pacientesRouter.get("/patients/:id", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -71,8 +95,16 @@ pacientesRouter.patch("/patients", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -86,8 +118,16 @@ pacientesRouter.patch("/patients/:id", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -111,8 +151,16 @@ pacientesRouter.delete("/patients", async (req, res) => {
     await Record.deleteMany({ patient: paciente._id });
     await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente); 
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -126,7 +174,15 @@ pacientesRouter.delete("/patients/:id", async (req, res) => {
     await Record.deleteMany({ patient: paciente._id });
     await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

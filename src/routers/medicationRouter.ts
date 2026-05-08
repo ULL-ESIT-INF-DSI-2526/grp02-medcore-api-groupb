@@ -11,8 +11,16 @@ medicationsRouter.post("/medications", async (req, res) => {
   try {
     await medicamento.save();
     res.status(201).send(medicamento);
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -36,8 +44,16 @@ medicationsRouter.get("/medications", async (req, res) => {
     const medicamentos = await Medication.find(filtro);
     if (medicamentos.length !== 0) res.send(medicamentos);
     else res.status(404).send();
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -47,8 +63,16 @@ medicationsRouter.get("/medications/:id", async (req, res) => {
     const medicamento = await Medication.findById(req.params.id);
     if (medicamento) res.send(medicamento);
     else res.status(404).send();
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -61,8 +85,16 @@ medicationsRouter.patch("/medications", async (req, res) => {
     const medicamento = await Medication.findOneAndUpdate(filtro, req.body, { new: true, runValidators: true });
     if (medicamento) res.send(medicamento);
     else res.status(404).send();
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -72,8 +104,16 @@ medicationsRouter.patch("/medications/:id", async (req, res) => {
     const medicamento = await Medication.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
     if (medicamento) res.send(medicamento);
     else res.status(404).send();
-  } catch (error) {
-    res.status(400).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -97,8 +137,16 @@ medicationsRouter.delete("/medications", async (req, res) => {
 
     await Medication.findByIdAndDelete(medicamento._id);
     res.send(medicamento); 
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -119,7 +167,15 @@ medicationsRouter.delete("/medications/:id", async (req, res) => {
 
     await Medication.findByIdAndDelete(req.params.id);
     res.send(medicamento);
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

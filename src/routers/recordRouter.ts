@@ -27,6 +27,10 @@ async function verificarMedicaciones(medicaciones: { codigoNacional: string, can
     if (!medicamento) { throw new Error(`El medicamento con código ${item.codigoNacional} no existe.`); }
     if (medicamento.stock < item.cantidad) { throw new Error(`Stock insuficiente para ${medicamento.nombre}`); }
 
+    if (medicamento.caducidadStock < new Date()) {
+      throw new Error(`El medicamento ${medicamento.nombre} está caducado y no puede ser prescrito.`);
+    }
+
     // Importe total
     total += medicamento.precio * item.cantidad;
 
@@ -65,46 +69,83 @@ recordsRouter.post("/records", async (req, res) => {
 
     await record.save();
     res.status(201).send(record);
-  } catch (error) {
-    return res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
-recordsRouter.get("/records", async (req, res) => {
+recordsRouter.get("/records/paciente", async (req, res) => {
   try {
-    let filtro = {};
-    if (req.query.dni) {
-      filtro = { dni: req.query.dni.toString() };
-      const paciente = await Patient.findOne(filtro);
-      if (!paciente) { return res.status(404).send({ error: "Paciente no encontrado" }) }
-
-      const registros = await Record.find({ paciente: paciente._id }).sort({ fechaInicio: 1 });
-      res.send(registros);
-    } else if (req.query.fechaInicio && req.query.fechaFin) {
-      if (req.query.tipo) { 
-        filtro = {
-          fechaInicio: {
-            $gte: new Date(req.query.fechaInicio.toString()),
-            $lte: new Date(req.query.fechaFin.toString())
-          },
-          tipo: req.query.tipo
-        };
-      } else {
-        filtro = {
-          fechaInicio: {
-            $gte: new Date(req.query.fechaInicio.toString()),
-            $lte: new Date(req.query.fechaFin.toString())
-          }
-        };
-      }
-
-      const registros = await Record.find(filtro);
-      res.send(registros);
-    } else {
-      res.status(400).send("Falta indicar número de identificación del paciente o un rango de fechas");
+    if (!req.query.dni) {
+      return res.status(400).send({ error: "Debe proporcionar el DNI del paciente" });
     }
-  } catch (error) {
-    res.status(500).send(error);
+
+    const paciente = await Patient.findOne({ dni: req.query.dni.toString() });
+    if (!paciente) {
+      return res.status(404).send({ error: "Paciente no encontrado" });
+    }
+
+    const registros = await Record.find({ paciente: paciente._id }).sort({ fechaInicio: 1 });
+    res.send(registros);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
+  }
+});
+
+recordsRouter.get("/records/fechas", async (req, res) => {
+  try {
+    const { fechaInicio, fechaFin, tipo } = req.query;
+
+    if (!fechaInicio || !fechaFin) {
+      return res.status(400).send({ error: "Debe proporcionar fechaInicio y fechaFin" });
+    }
+
+    let filtro = {};
+    if (tipo) {
+      filtro = {
+        fechaInicio: {
+          $gte: new Date(fechaInicio.toString()),
+          $lte: new Date(fechaFin.toString())
+        },
+        tipo: tipo.toString()
+      };
+    } else {
+      filtro = {
+        fechaInicio: {
+          $gte: new Date(fechaInicio.toString()),
+          $lte: new Date(fechaFin.toString())
+        },
+      };
+    }
+
+    const registros = await Record.find(filtro).sort({ fechaInicio: 1 });
+    res.send(registros);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -116,11 +157,18 @@ recordsRouter.get("/records/:id", async (req, res) => {
     } else {
       res.status(404).send();
     }
-  } catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
-
 
 recordsRouter.patch("/records/:id", async (req, res) => {
   try {
@@ -161,11 +209,18 @@ recordsRouter.patch("/records/:id", async (req, res) => {
     );
 
     res.send(recordActualizado);
-  }catch (error) {
-    res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
-
 
 recordsRouter.delete("/records/:id", async (req, res) => {
   try {
@@ -187,7 +242,15 @@ recordsRouter.delete("/records/:id", async (req, res) => {
     await Record.findByIdAndDelete(req.params.id);
 
     res.send(record);
-  } catch (error) {
-    return res.status(500).send(error);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.name === 'ValidationError') {
+        return res.status(400).send({ error: error.message });
+      }
+      
+      return res.status(500).send({ error: error.message });
+    }
+
+    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
