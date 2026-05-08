@@ -6,8 +6,8 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsc-watch --onSuccess \"env-cmd -f ./config/dev.env node dist/index.js\"",
-    "test": "env-cmd -f ./config/dev.env vitest run",
-    "coverage": "env-cmd -f ./config/dev.env vitest run --coverage --coverage.include **/src/*"
+    "test": "env-cmd -f ./config/test.env vitest run",
+    "coverage": "env-cmd -f ./config/test.env vitest run --coverage --coverage.include **/src/*"
   },
   "type": "module",
   "keywords": [],
