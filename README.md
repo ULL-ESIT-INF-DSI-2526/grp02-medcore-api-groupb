@@ -10,3 +10,5 @@ Para acceder a la interfaz gráfica y probar los endpoints:
 ## Instrucciones de Ejecución en Local
 ```bash
 npm run dev
+npm run coverage
+npm run test
