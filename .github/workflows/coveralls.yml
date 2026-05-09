@@ -29,6 +29,10 @@ jobs:
     - name: Install dependencies 
       run: npm ci
     
+    - name: Override test.env for CI (use local Mongo)
+      run: |
+        printf "PORT=3000\nMONGODB_URL=mongodb://127.0.0.1:27017/medcore-test\nSWAGGER_SERVER=http://localhost:3000\n" > ./config/test.env
+
     - name: Generate coverage info
       run: npm run coverage 
 
