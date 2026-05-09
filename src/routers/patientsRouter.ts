@@ -18,8 +18,6 @@ pacientesRouter.post("/patients", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -49,8 +47,6 @@ pacientesRouter.get("/patients", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -71,8 +67,6 @@ pacientesRouter.get("/patients/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -103,8 +97,6 @@ pacientesRouter.patch("/patients", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -126,8 +118,6 @@ pacientesRouter.patch("/patients/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -148,7 +138,7 @@ pacientesRouter.delete("/patients", async (req, res) => {
       return res.status(404).send();
     }
 
-    await Record.deleteMany({ patient: paciente._id });
+    await Record.deleteMany({ paciente: paciente._id });
     await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente); 
   } catch (error: unknown) {
@@ -159,8 +149,6 @@ pacientesRouter.delete("/patients", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -171,7 +159,7 @@ pacientesRouter.delete("/patients/:id", async (req, res) => {
       return res.status(404).send();
     }
 
-    await Record.deleteMany({ patient: paciente._id });
+    await Record.deleteMany({ paciente: paciente._id });
     await Patient.findByIdAndDelete(paciente._id); 
     res.send(paciente);
   } catch (error: unknown) {
@@ -182,7 +170,5 @@ pacientesRouter.delete("/patients/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

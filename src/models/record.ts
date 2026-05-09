@@ -40,11 +40,6 @@ const PrescribedMedicationSchema = new Schema<PrescribedMedicationInterface>({
   instruccionesAdministracion: {
     type: String,
     required: true,
-    validate: (value: string) => {
-      if (!validator.isLength(value.trim(), { min: 3 })) {
-        throw new Error('Las instrucciones de dosis deben tener al menos 3 caracteres');
-      }
-    },
   }
 }, { _id: false });
 
@@ -81,20 +76,10 @@ const RecordSchema = new Schema<RecordDocumentInterface>({
   motivo: {
     type: String,
     required: true,
-    validate: (value: string) => {
-      if (!validator.isLength(value.trim(), { min: 3 })) {
-        throw new Error('La razón debe tener al menos 3 caracteres');
-      }
-    },
   },
   diagnostico: {
     type: String,
     required: true,
-    validate: (value: string) => {
-      if (!validator.isLength(value.trim(), { min: 3 })) {
-        throw new Error('El diagnóstico debe tener al menos 3 caracteres');
-      }
-    },
   },
   medicamentosPrescritos: {
     type: [PrescribedMedicationSchema],

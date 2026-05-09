@@ -71,14 +71,12 @@ recordsRouter.post("/records", async (req, res) => {
     res.status(201).send(record);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -97,14 +95,12 @@ recordsRouter.get("/records/paciente", async (req, res) => {
     res.send(registros);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -138,14 +134,12 @@ recordsRouter.get("/records/fechas", async (req, res) => {
     res.send(registros);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -159,14 +153,12 @@ recordsRouter.get("/records/:id", async (req, res) => {
     }
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -211,14 +203,12 @@ recordsRouter.patch("/records/:id", async (req, res) => {
     res.send(recordActualizado);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -244,13 +234,11 @@ recordsRouter.delete("/records/:id", async (req, res) => {
     res.send(record);
   } catch (error: unknown) {
     if (error instanceof Error) {
-      if (error.name === 'ValidationError') {
+      if (error.name === 'ValidationError' || error.name === 'Error') {
         return res.status(400).send({ error: error.message });
       }
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

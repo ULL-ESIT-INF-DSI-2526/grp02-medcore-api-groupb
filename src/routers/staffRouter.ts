@@ -19,8 +19,6 @@ staffRouter.post("/staff", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -52,8 +50,6 @@ staffRouter.get("/staff", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -75,8 +71,6 @@ staffRouter.get("/staff/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -108,8 +102,6 @@ staffRouter.patch("/staff", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -131,8 +123,6 @@ staffRouter.patch("/staff/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -155,7 +145,7 @@ staffRouter.delete("/staff", async (req, res) => {
       return res.status(404).send();
     }
 
-    const registros = await Record.findOne({ responsibleDoctor: staffMember._id });
+    const registros = await Record.findOne({ medicoResponsable: staffMember._id });
     if (registros) {
       return res.status(409).send({
         error: "El personal médico que intenta borrar tiene historiales asignados, cambie su estado a 'inactivo' en lugar de borrarlo"
@@ -172,8 +162,6 @@ staffRouter.delete("/staff", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -185,7 +173,7 @@ staffRouter.delete("/staff/:id", async (req, res) => {
       return res.status(404).send();
     }
 
-    const registros = await Record.findOne({ responsibleDoctor: staffMember._id });
+    const registros = await Record.findOne({ medicoResponsable: staffMember._id });
     if (registros) {
       return res.status(409).send({
         error: "El personal médico que intenta borrar tiene historiales asignados, cambie su estado a 'inactivo' en lugar de borrarlo"
@@ -202,7 +190,5 @@ staffRouter.delete("/staff/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });

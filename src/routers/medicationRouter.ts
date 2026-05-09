@@ -19,8 +19,6 @@ medicationsRouter.post("/medications", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -52,8 +50,6 @@ medicationsRouter.get("/medications", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -71,8 +67,6 @@ medicationsRouter.get("/medications/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -93,8 +87,6 @@ medicationsRouter.patch("/medications", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -112,8 +104,6 @@ medicationsRouter.patch("/medications/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -128,7 +118,7 @@ medicationsRouter.delete("/medications", async (req, res) => {
       return res.status(404).send();
     } 
 
-    const registro = await Record.findOne({ "prescribedMedications.medication": medicamento._id });
+    const registro = await Record.findOne({ "medicamentosPrescritos.medicamento": medicamento._id });
     if (registro) {
       return res.status(409).send({
         error: "No se puede borrar el medicamento porque se encuentra prescrito"
@@ -145,8 +135,6 @@ medicationsRouter.delete("/medications", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
 
@@ -158,7 +146,7 @@ medicationsRouter.delete("/medications/:id", async (req, res) => {
       return res.status(404).send();
     }
 
-    const registro = await Record.findOne({ "prescribedMedications.medication": req.params.id })
+    const registro = await Record.findOne({ "medicamentosPrescritos.medicamento": req.params.id })
     if (registro) {
       return res.status(409).send({
         error: "No se puede borrar el medicamento porque se encuentra prescrito"
@@ -175,7 +163,5 @@ medicationsRouter.delete("/medications/:id", async (req, res) => {
       
       return res.status(500).send({ error: error.message });
     }
-
-    return res.status(500).send({ error: "Ha ocurrido un error inesperado en el servidor" });
   }
 });
