@@ -6,8 +6,12 @@ import { recordsRouter } from './routers/recordRouter.js';
 import { staffRouter } from './routers/staffRouter.js';
 import { defaultRouter } from './routers/defaultRouter.js';
 
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from './config/swagger.js';
+
 export const app = express();
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(pacientesRouter);
 app.use(medicationsRouter);
 app.use(recordsRouter);
